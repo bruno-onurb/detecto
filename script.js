@@ -1,3 +1,52 @@
+// --- Daily Puzzle Loader + State Guard (paste at very top) ---
+const DAILY_TZ = 'Europe/Zagreb';
+const STORAGE_KEY = 'detecto-game-state-v3'; // saved state key (keep stable)
+
+// Format a date in the target timezone as YYYY-MM-DD
+function ymdInTZ(date, tz = DAILY_TZ) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: tz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date);
+}
+
+// Fetch JSON with a nice error if missing
+async function fetchJson(url) {
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return res.json();
+}
+
+// Try today; if not found, walk backwards up to 14 days and take first hit
+async function loadPuzzleWithFallback(maxLookbackDays = 14) {
+  const now = new Date();
+  for (let back = 0; back <= maxLookbackDays; back++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - back);
+    const ymd = ymdInTZ(d);
+    const url = `puzzles/${ymd}.json`;
+    try {
+      const data = await fetchJson(url);
+      console.log('Loaded puzzle:', url);
+      return data; // { date, master, clues, ... }
+    } catch (e) {
+      // keep trying
+    }
+  }
+  throw new Error('No puzzle files found in the last 14 days.');
+}
+
+// Basic state helpers
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); }
+  catch { return null; }
+}
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
 /*
  * Game logic for the Decrypto‑Wordle Hybrid.
  * This file handles loading/saving state, rendering UI elements
@@ -1060,3 +1109,25 @@ function init() {
     learnMoreBtn.onclick = () => {};
   }
 }
+// --- Game Bootstrap (paste near bottom) ---
+async function bootstrap() {
+  try {
+    const puzzle = await loadPuzzleWithFallback(14);
+
+    // Reset saved progress if the stored date is different from the loaded puzzle
+    const state = loadState();
+    if (!state || state.date !== puzzle.date) {
+      saveState({ date: puzzle.date, guesses: [], solved: false });
+    }
+
+    // TODO: call your existing init/start functions here,
+    // and pass `puzzle` if your code expects it.
+    // Example:
+    // initGame(puzzle);
+
+  } catch (err) {
+    console.error(err);
+    alert('Sorry, no puzzles available right now.');
+  }
+}
+window.addEventListener('DOMContentLoaded', bootstrap);
