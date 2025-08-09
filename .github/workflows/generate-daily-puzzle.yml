@@ -1,36 +1,40 @@
 name: Generate Daily Puzzle
+
 on:
   schedule:
-    # Runs at 00:00 in Europe/Zagreb (22:00 UTC in summer). Adjust later if needed.
+    # 00:00 Europe/Zagreb (22:00 UTC in summer)
     - cron: "0 22 * * *"
-  workflow_dispatch: {} # allow manual run
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  generate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
-      - name: Generate puzzle(s) (no API needed)
-        run: |
-          node tools/generate-daily.js
-                - name: Validate all puzzles
-        run: |
-          node tools/validate.mjs
+      - name: Generate puzzles (no API)
+        run: node tools/generate-daily.js
+
+      - name: Validate puzzles
+        run: node tools/validate.mjs
 
       - name: Commit & push if changed
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add puzzles/*.json
-          git diff --cached --quiet || git commit -m "chore: add daily puzzles"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "chore: add/validate daily puzzles"
+            git push
+          fi
