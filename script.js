@@ -6,41 +6,76 @@
 
 // Sample puzzle data. In a production scenario this could be loaded
 // from a server or rotated daily. For now it's static for simplicity.
-const PUZZLE_DATA = {
-  id: "2025-08-08",
-  master: {
-    answer: "David",
-    aliases: ["Michelangelo's David", "Statue of David"],
-    funFact: "Carved from a single block of marble between 1501–1504, Michelangelo’s David stands 17 feet tall in Florence and is a Renaissance icon.",
-    learnMoreUrl: "https://en.wikipedia.org/wiki/David_(Michelangelo)"
-  },
-  subClues: [
-    {
-      id: "A",
-      answer: "Marble",
-      aliases: ["Carrara marble"],
-      hints: ["stone", "white", "carve", "statue", "material"],
-      revealedCount: 1,
-      solved: false
-    },
-    {
-      id: "B",
-      answer: "Florence",
-      aliases: ["Firenze"],
-      hints: ["italy", "renaissance", "duomo", "uffizi", "tuscany"],
-      revealedCount: 1,
-      solved: false
-    },
-    {
-      id: "C",
-      answer: "Michelangelo",
-      aliases: ["Buonarroti"],
-      hints: ["artist", "sculptor", "painter", "sistine", "renowned"],
-      revealedCount: 1,
-      solved: false
+// --- Daily Puzzle Loader ---
+const DAILY_TZ = 'Europe/Zagreb'; // canonical flip timezone
+let PUZZLE_DATA = null; // will be set before init()
+const STORAGE_KEY = 'detecto-game-state-v3'; // keep as-is in your file
+
+function ymdInTZ(tz){
+  const fmt = new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'});
+  return fmt.format(new Date());
+}
+
+async function loadTodaysPuzzle(){
+  const today = ymdInTZ(DAILY_TZ);
+  const url = `puzzles/${today}.json`; // RELATIVE path (works on GitHub Pages)
+  try{
+    const res = await fetch(url, { cache: 'no-store' });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const day = await res.json();
+    // Normalize to match old code expectations
+    PUZZLE_DATA = {
+      id: day.id || today,
+      master: day.master,
+      subClues: day.subClues.map(sc => ({ ...sc, revealedCount: 1, solved: false }))
+    };
+  }catch(err){
+    console.error('Missing puzzle for today, falling back to a safe default.', err);
+    PUZZLE_DATA = {
+      id: "fallback-" + today,
+      master: {
+        answer: "David",
+        aliases: ["Michelangelo's David", "Statue of David"],
+        funFact: "Carved from a single block of marble between 1501–1504, Michelangelo’s David stands 17 feet tall in Florence and is a Renaissance icon.",
+        learnMoreUrl: "https://en.wikipedia.org/wiki/David_(Michelangelo)"
+      },
+      subClues: [
+        { id:"A", answer:"Marble", aliases:["Carrara marble"], hints:["stone","white","carve","statue","material"], revealedCount:1, solved:false },
+        { id:"B", answer:"Florence", aliases:["Firenze"], hints:["italy","renaissance","duomo","uffizi","tuscany"], revealedCount:1, solved:false },
+        { id:"C", answer:"Michelangelo", aliases:["Buonarroti"], hints:["artist","sculptor","painter","sistine","renowned"], revealedCount:1, solved:false }
+      ]
+    };
+  }
+}
+
+// Replace the old DOMContentLoaded with this:
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadTodaysPuzzle();
+  init();               // your existing init() uses PUZZLE_DATA
+  startMidnightWatcher();
+});
+
+function startMidnightWatcher(){
+  let current = ymdInTZ(DAILY_TZ);
+  setInterval(async () => {
+    const now = ymdInTZ(DAILY_TZ);
+    if (now !== current){
+      current = now;
+      localStorage.removeItem(STORAGE_KEY);
+      await loadTodaysPuzzle();
+      prevLivesCount = null; // keep your existing var
+      loadGame();            // reuse your existing function
+      render();
+      const toast = document.getElementById('help-toast');
+      if (toast){
+        toast.querySelector('strong').textContent = 'New Puzzle';
+        toast.querySelector('p').textContent = 'A fresh daily puzzle is ready.';
+        toast.classList.remove('hidden');
+        setTimeout(()=>toast.classList.add('hidden'), 6000);
+      }
     }
-  ]
-};
+  }, 30000);
+}
 
 // Icon SVG definitions for UI elements
 const ICONS = {
@@ -226,9 +261,6 @@ function updateLivesUI() {
   }
   prevLivesCount = gameState.lives;
 }
-// Key used in localStorage for persisting game state. Use a stable key
-// to ensure progress and onboarding flags persist across sessions.
-const STORAGE_KEY = 'detecto-game-state-v3';
 
 // Current game state; initialised either from saved data or fresh puzzle.
 let gameState;
