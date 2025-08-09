@@ -23,6 +23,9 @@ jobs:
       - name: Generate puzzle(s) (no API needed)
         run: |
           node tools/generate-daily.js
+                - name: Validate all puzzles
+        run: |
+          node tools/validate.mjs
 
       - name: Commit & push if changed
         run: |
