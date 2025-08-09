@@ -119,6 +119,73 @@ let modalEscHandler = null;
 const ONBOARDING_KEY = 'detecto_onboarding_seen_v1';
 // Handler reference for closing onboarding on Escape key
 let onboardEscHandler = null;
+// --- Focus Trap Utilities ---
+let _focusTrapCleanup = null;
+let _lastFocusedElement = null;
+
+function trapFocus(container){
+  // Clean any previous trap before setting a new one
+  releaseFocus();
+  if (!container) return;
+
+  // Remember where focus was before opening
+  _lastFocusedElement = document.activeElement;
+
+  const focusableSel =
+    'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), ' +
+    'button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const raw = container.querySelectorAll(focusableSel);
+  const focusables = Array.from(raw).filter(el => el.offsetParent !== null);
+
+  const first = focusables[0];
+  const last  = focusables[focusables.length - 1];
+
+  // Move focus inside the dialog
+  if (first) first.focus();
+
+  function onKeydown(e){
+    if (e.key !== 'Tab') return;
+    if (!focusables.length) { e.preventDefault(); return; }
+
+    // Shift+Tab on first -> go to last
+    if (e.shiftKey && document.activeElement === first){
+      e.preventDefault();
+      last.focus();
+      return;
+    }
+    // Tab on last -> go to first
+    if (!e.shiftKey && document.activeElement === last){
+      e.preventDefault();
+      first.focus();
+      return;
+    }
+  }
+
+  function onFocusIn(e){
+    // If focus tries to escape the container, pull it back
+    if (!container.contains(e.target)) {
+      e.stopPropagation();
+      if (first) first.focus();
+    }
+  }
+
+  document.addEventListener('keydown', onKeydown);
+  document.addEventListener('focusin', onFocusIn);
+
+  _focusTrapCleanup = () => {
+    document.removeEventListener('keydown', onKeydown);
+    document.removeEventListener('focusin', onFocusIn);
+    _focusTrapCleanup = null;
+  };
+}
+
+function releaseFocus(){
+  if (_focusTrapCleanup) _focusTrapCleanup();
+  if (_lastFocusedElement && typeof _lastFocusedElement.focus === 'function'){
+    _lastFocusedElement.focus();
+  }
+  _lastFocusedElement = null;
+}
 
 /**
  * Trigger a shake animation on a feedback element and fade it out. This helper
@@ -762,6 +829,9 @@ function showEndModal(won) {
   }
   // Display the modal
   overlay.classList.remove('hidden');
+  overlay.setAttribute('aria-hidden','false');
+const dialog = document.getElementById('modal');
+if (dialog) trapFocus(dialog);
   // Attach modal close behaviors
   // Close on backdrop click (only when clicking directly on the overlay)
   overlay.onclick = (e) => { if (e.target === overlay) hideModal(); };
@@ -841,6 +911,8 @@ function hideModal(){
   const overlay = document.getElementById('modal-overlay');
   if (!overlay) return;
   overlay.classList.add('hidden');
+  overlay.setAttribute('aria-hidden','true');
+releaseFocus();
   // Remove backdrop click handler
   overlay.onclick = null;
   // Remove Escape key listener if previously attached
@@ -862,6 +934,8 @@ function showOnboarding(){
   if (!ov) return;
   ov.classList.remove('hidden');
   ov.setAttribute('aria-hidden','false');
+  const dialog = ov.querySelector('.modal');
+  if (dialog) trapFocus(dialog);
   // Backdrop click: only hide when clicking directly on overlay
   ov.onclick = (e) => { if (e.target === ov) hideOnboarding(); };
   // Esc key: attach keydown listener to close
@@ -883,6 +957,7 @@ function hideOnboarding(){
   if (!ov) return;
   ov.classList.add('hidden');
   ov.setAttribute('aria-hidden','true');
+  releaseFocus();
   // Remove backdrop click handler
   ov.onclick = null;
   // Remove Escape key listener
