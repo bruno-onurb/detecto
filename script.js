@@ -985,6 +985,3 @@ function init() {
     learnMoreBtn.onclick = () => {};
   }
 }
-
-// Kick off the app when DOM is ready
-document.addEventListener('DOMContentLoaded', init);
