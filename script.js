@@ -1113,6 +1113,33 @@ function init() {
 async function bootstrap() {
   try {
     const puzzle = await loadPuzzleWithFallback(14);
+    // --- Game Bootstrap (ensure this is already in your file)
+async function bootstrap() {
+  try {
+    const puzzle = await loadPuzzleWithFallback(14);
+
+    // Show which puzzle actually loaded
+    const badge = document.getElementById('puzzle-status');
+    if (badge) badge.textContent = `Puzzle date: ${puzzle.date}`;
+
+    // Reset saved progress if date changed
+    const state = loadState();
+    if (!state || state.date !== puzzle.date) {
+      saveState({ date: puzzle.date, guesses: [], solved: false });
+    }
+
+    // TODO: call your actual init with `puzzle`
+    // initGame(puzzle);
+
+  } catch (err) {
+    console.error(err);
+    const badge = document.getElementById('puzzle-status');
+    if (badge) badge.textContent = 'No puzzles available';
+    alert('Sorry, no puzzles available right now.');
+  }
+}
+window.addEventListener('DOMContentLoaded', bootstrap);
+
 
     // Reset saved progress if the stored date is different from the loaded puzzle
     const state = loadState();
