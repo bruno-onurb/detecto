@@ -153,23 +153,16 @@ async function loadLatestPuzzle(maxLookbackDays = 14) {
   if (badge) badge.textContent = `Puzzle date: ${today} (fallback)`;
 }
 
-// Replace the old DOMContentLoaded with this:
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadTodaysPuzzle();
-  init();               // your existing init() uses PUZZLE_DATA
-  startMidnightWatcher();
-});
-
 function startMidnightWatcher(){
-  let current = ymdInTZ(DAILY_TZ);
+  let current = ymdInTZ(new Date(), DAILY_TZ); // pass a Date now
   setInterval(async () => {
-    const now = ymdInTZ(DAILY_TZ);
+    const now = ymdInTZ(new Date(), DAILY_TZ); // pass a Date now
     if (now !== current){
       current = now;
       localStorage.removeItem(STORAGE_KEY);
-      await loadLatestPuzzle(0); // only today at midnight
-      prevLivesCount = null; // keep your existing var
-      loadGame();            // reuse your existing function
+      await loadLatestPuzzle(0);   // only fetch today's puzzle at midnight
+      prevLivesCount = null;       // keep your existing var
+      loadGame();
       render();
       const toast = document.getElementById('help-toast');
       if (toast){
@@ -181,6 +174,7 @@ function startMidnightWatcher(){
     }
   }, 30000);
 }
+
 
 // Icon SVG definitions for UI elements
 const ICONS = {
