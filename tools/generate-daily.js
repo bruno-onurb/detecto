@@ -1,52 +1,106 @@
-// Simple daily puzzle generator (no API). Writes today's and tomorrow's files.
+// Proper daily puzzle generator (no API). Writes today's and tomorrow's files
+// in the rich schema used by the game:
+//
+// {
+//   "date": "YYYY-MM-DD",
+//   "master": { "answer": "APPLE", "aliases": [], "funFact": "", "learnMoreUrl": "" },
+//   "subClues": [
+//     { "id": "A", "answer": "FRUIT", "aliases": [], "hints": ["red","green","sweet","pie","orchard"] },
+//     { "id": "B", "answer": "TREE",  "aliases": [], "hints": ["branch","leaf","trunk","orchard","blossom"] },
+//     { "id": "C", "answer": "SEED",  "aliases": [], "hints": ["core","plant","sprout","pit","germ"] }
+//   ],
+//   "difficulty": "normal",
+//   "version": 1
+// }
+
 const fs = require('fs');
 const path = require('path');
 
 const TZ = 'Europe/Zagreb';
 const OUT_DIR = path.join(process.cwd(), 'puzzles');
 
-function ymd(d){ return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit' }).format(d); }
+function ymd(d){ 
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit' }).format(d); 
+}
 function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p, { recursive:true }); }
 
+// BANK: master + 3 sub‑clues (answer + 5 hints each). Add more entries over time.
 const BANK = [
-  { master: "BRIDGE", clues: ["RIVER","GAP","CARD","CONNECT"], difficulty:"normal" },
-  { master: "LIGHT",  clues: ["BULB","WEIGHT","SUN","SPEED"],  difficulty:"normal" },
-  { master: "APPLE",  clues: ["FRUIT","TREE","MAC","SEED"],    difficulty:"easy"   },
-  { master: "TRACK",  clues: ["RACE","TRACE","RAIL","FOLLOW"], difficulty:"normal" },
-  { master: "RING",   clues: ["PHONE", "CIRCLE", "BELL", "JEWEL"], difficulty: "easy" },
-  { master: "PLANT",  clues: ["LEAF", "FACTORY", "STEM", "GROW"], difficulty: "normal" },
-  { master: "TABLE",  clues: ["DINING", "CHART", "ROW", "FURNITURE"], difficulty: "easy" },
-  { master: "CLOUD",  clues: ["RAIN", "SERVER", "SKY", "PUFF"], difficulty: "normal" },
-  { master: "POINT",  clues: ["DOT", "ARGUE", "SCORE", "TIP"], difficulty: "normal" },
-  { master: "SCALE",  clues: ["WEIGH", "LIZARD", "LEVEL", "MUSIC"], difficulty: "hard" },
-  { master: "CHARGE", clues: ["BATTERY", "ACCUSE", "PRICE", "RUN"], difficulty: "normal" },
-  { master: "BARK",   clues: ["DOG", "TREE", "SHOUT", "SKIN"], difficulty: "normal" },
-  { master: "BANK",   clues: ["MONEY", "RIVER", "SLOPE", "TRUST"], difficulty: "normal" },
-  { master: "KEY",    clues: ["LOCK", "PIANO", "ISLAND", "IMPORTANT"], difficulty: "easy" },
-  { master: "MARCH",  clues: ["MONTH", "WALK", "PARADE", "ARMY"], difficulty: "easy" },
-  { master: "CAP",    clues: ["HAT", "LIMIT", "BOTTLE", "CAPITAL"], difficulty: "easy" },
-  { master: "PRESS",  clues: ["NEWS", "PUSH", "IRON", "MEDIA"], difficulty: "normal" },
-  { master: "DRILL",  clues: ["TOOL", "TRAIN", "HOLE", "MILITARY"], difficulty: "normal" },
-  { master: "DRAFT",  clues: ["BREEZE", "SKETCH", "BEER", "SELECT"], difficulty: "hard" },
-  { master: "SPRING", clues: ["SEASON", "COIL", "JUMP", "WATER"], difficulty: "normal" },
-  { master: "SUIT",   clues: ["LAWSUIT", "DECK", "CLOTHES", "FIT"], difficulty: "normal" },
-  { master: "PITCH",  clues: ["TAR", "THROW", "TONE", "SALES"], difficulty: "normal" },
-  { master: "BLOCK",  clues: ["WOOD", "CITY", "STOP", "CHAIN"], difficulty: "normal" },
-  { master: "NET",    clues: ["INTERNET", "FISH", "GOAL", "AFTER"], difficulty: "easy" },
-  { master: "MOUSE",  clues: ["CHEESE","PC","CURSOR","TAIL"],  difficulty:"easy"   }
+  {
+    master: "APPLE",
+    difficulty: "easy",
+    subClues: [
+      { answer: "FRUIT", hints: ["red","green","sweet","pie","orchard"] },
+      { answer: "TREE",  hints: ["branch","leaf","trunk","orchard","blossom"] },
+      { answer: "SEED",  hints: ["core","plant","sprout","pit","germ"] }
+    ],
+    funFact: "There are over 7,500 varieties of apples grown worldwide."
+  },
+  {
+    master: "BRIDGE",
+    difficulty: "normal",
+    subClues: [
+      { answer: "RIVER",  hints: ["water","bank","flow","cross","current"] },
+      { answer: "GAP",    hints: ["space","divide","span","break","separate"] },
+      { answer: "CARD",   hints: ["deck","game","trick","bid","suit"] }
+    ],
+    funFact: "The Golden Gate Bridge was once the longest and tallest suspension bridge."
+  },
+  {
+    master: "LIGHT",
+    difficulty: "normal",
+    subClues: [
+      { answer: "BULB",  hints: ["lamp","switch","socket","LED","filament"] },
+      { answer: "SUN",   hints: ["day","shine","sky","bright","solar"] },
+      { answer: "SPEED", hints: ["fast","c","vacuum","physics","Einstein"] }
+    ],
+    funFact: "Light travels at about 299,792 km per second in vacuum."
+  },
+  {
+    master: "MOUSE",
+    difficulty: "easy",
+    subClues: [
+      { answer: "CHEESE", hints: ["food","hole","dairy","trap","rodent"] },
+      { answer: "CURSOR", hints: ["pointer","click","screen","drag","arrow"] },
+      { answer: "TAIL",   hints: ["long","animal","end","behind","appendage"] }
+    ],
+    funFact: "Computer mice were first popularized by Xerox PARC and Apple."
+  },
+  {
+    master: "SPRING",
+    difficulty: "normal",
+    subClues: [
+      { answer: "SEASON", hints: ["flowers","rain","bloom","March","April"] },
+      { answer: "COIL",   hints: ["metal","compress","bounce","spiral","tension"] },
+      { answer: "WATER",  hints: ["fresh","source","hot","natural","well"] }
+    ],
+    funFact: "In many regions, spring is associated with new growth and festivals."
+  }
 ];
 
-function puzzleFor(dateStr){
-  // deterministically rotate through BANK by date
+function entryFor(dateStr){
   const idx = Math.abs([...dateStr].reduce((a,c)=>a + c.charCodeAt(0),0)) % BANK.length;
   const base = BANK[idx];
-  return { date: dateStr, master: base.master, clues: base.clues, difficulty: base.difficulty, version: 1 };
+  // build rich schema with 3 sub‑clues A/B/C
+  const subClues = base.subClues.map((sc, i) => ({
+    id: String.fromCharCode(65 + i),
+    answer: sc.answer,
+    aliases: [],
+    hints: sc.hints
+  }));
+  return {
+    date: dateStr,
+    master: { answer: base.master, aliases: [], funFact: base.funFact || "", learnMoreUrl: "" },
+    subClues,
+    difficulty: base.difficulty,
+    version: 1
+  };
 }
 
 function writePuzzle(date){
   const file = path.join(OUT_DIR, `${date}.json`);
   if (!fs.existsSync(file)) {
-    fs.writeFileSync(file, JSON.stringify(puzzleFor(date), null, 2));
+    fs.writeFileSync(file, JSON.stringify(entryFor(date), null, 2));
     console.log('Wrote', file);
   } else {
     console.log('Exists', file);
