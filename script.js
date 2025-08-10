@@ -85,15 +85,6 @@ async function loadPuzzleWithFallback(maxLookbackDays = 14) {
   throw new Error('No puzzle files found in the last 14 days.');
 }
 
-// Basic state helpers
-function loadState() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); }
-  catch { return null; }
-}
-function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
 /*
  * Game logic for the Decrypto‑Wordle Hybrid.
  * This file handles loading/saving state, rendering UI elements
@@ -1232,11 +1223,21 @@ async function bootstrap() {
   try {
     await loadLatestPuzzle(14);
 
-    // reset saved progress when the puzzle date changes
-    const state = loadState();
-    if (!state || state.date !== PUZZLE_DATA.id) {
-      saveState({ date: PUZZLE_DATA.id, guesses: [], solved: false });
+// If a saved game exists for a different puzzle date, clear it.
+// (Do NOT overwrite a valid saved game for the same date.)
+try {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    const parsed = JSON.parse(raw);
+    const savedId = parsed && parsed.puzzle && parsed.puzzle.id;
+    if (savedId && savedId !== PUZZLE_DATA.id) {
+      localStorage.removeItem(STORAGE_KEY);
     }
+  }
+} catch (_) {
+  // ignore parse errors; start clean
+  localStorage.removeItem(STORAGE_KEY);
+}
 
     init();               // your existing init() uses PUZZLE_DATA
     startMidnightWatcher();
