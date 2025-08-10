@@ -974,6 +974,25 @@ function showEndModal(won) {
     scoreBreakdown.appendChild(list);
   }
   // Display the modal
+    // --- Inject "Next puzzle" countdown into the modal ---
+  // Remove any previous timer (if player reopens the modal without full reload)
+  const oldTimer = document.getElementById('next-puzzle-timer');
+  if (oldTimer && oldTimer.parentNode) oldTimer.parentNode.removeChild(oldTimer);
+
+  const timerDiv = document.createElement('div');
+  timerDiv.id = 'next-puzzle-timer';
+  timerDiv.style.marginTop = '12px';
+  timerDiv.style.font = '14px/1.3 system-ui, sans-serif';
+  timerDiv.style.opacity = '.9';
+  timerDiv.innerHTML = 'Next puzzle in <strong>--:--:--</strong>';
+
+  // Append at the bottom of the modal body.
+  // Use scoreBreakdown if you want it under the score; otherwise use messageElem.
+  const timerHost = scoreBreakdown || messageElem;
+  if (timerHost) timerHost.appendChild(timerDiv);
+
+  // Start ticking
+  if (window.__detectoTimer) window.__detectoTimer.startCountdown();
   overlay.classList.remove('hidden');
   overlay.setAttribute('aria-hidden','false');
 const dialog = document.getElementById('modal');
