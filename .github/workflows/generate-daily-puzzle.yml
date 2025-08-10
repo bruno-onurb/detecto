@@ -21,8 +21,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Generate puzzles (no API)
+      - name: Install deps (OpenAI SDK)
+        run: npm install openai@4
+
+      - name: Generate puzzles (GPT with fallback)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: node tools/generate-daily.js
+
       - name: List generated files
         run: |
           echo "puzzles directory:"
@@ -31,6 +37,7 @@ jobs:
           set -e
           TODAY=$(node -e "console.log(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zagreb',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()))")
           cat "puzzles/${TODAY}.json"
+
       - name: Validate puzzles
         run: node tools/validate.mjs
 
