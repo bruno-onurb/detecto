@@ -1079,6 +1079,8 @@ function hideModal(){
   overlay.setAttribute('aria-hidden','true');
 releaseFocus();
   // Remove backdrop click handler
+  // Stop countdown when modal closes
+  if (window.__detectoTimer) window.__detectoTimer.stopCountdown();
   overlay.onclick = null;
   // Remove Escape key listener if previously attached
   if (modalEscHandler){
