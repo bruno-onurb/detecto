@@ -1,0 +1,49 @@
+{
+  "date": "2025-09-02",
+  "master": {
+    "answer": "CLOUD",
+    "aliases": [],
+    "funFact": "Cirrus clouds are thin and wispy, found high in the atmosphere.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "CIRRUS",
+      "aliases": [],
+      "hints": [
+        "wispy",
+        "high",
+        "ice",
+        "thin",
+        "feather"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "SERVER",
+      "aliases": [],
+      "hints": [
+        "compute",
+        "storage",
+        "aws",
+        "azure",
+        "remote"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "STORM",
+      "aliases": [],
+      "hints": [
+        "thunder",
+        "dark",
+        "rain",
+        "front",
+        "lightning"
+      ]
+    }
+  ],
+  "difficulty": "easy",
+  "version": 1
+}

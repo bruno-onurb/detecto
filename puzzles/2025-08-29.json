@@ -1,0 +1,49 @@
+{
+  "date": "2025-08-29",
+  "master": {
+    "answer": "LASER",
+    "aliases": [],
+    "funFact": "LASER stands for Light Amplification by Stimulated Emission of Radiation.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "BEAM",
+      "aliases": [],
+      "hints": [
+        "narrow",
+        "pointer",
+        "coherent",
+        "light",
+        "line"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "OPTICS",
+      "aliases": [],
+      "hints": [
+        "lens",
+        "mirror",
+        "focus",
+        "prism",
+        "glass"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "SCANNER",
+      "aliases": [],
+      "hints": [
+        "barcode",
+        "sweep",
+        "read",
+        "grocery",
+        "line"
+      ]
+    }
+  ],
+  "difficulty": "normal",
+  "version": 1
+}

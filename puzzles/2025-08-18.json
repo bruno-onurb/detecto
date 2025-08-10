@@ -1,0 +1,49 @@
+{
+  "date": "2025-08-18",
+  "master": {
+    "answer": "SPRING",
+    "aliases": [],
+    "funFact": "In many climates, spring marks the start of the growing season.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "SEASON",
+      "aliases": [],
+      "hints": [
+        "flowers",
+        "rain",
+        "bloom",
+        "march",
+        "april"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "COIL",
+      "aliases": [],
+      "hints": [
+        "metal",
+        "compress",
+        "bounce",
+        "spiral",
+        "tension"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "WATER",
+      "aliases": [],
+      "hints": [
+        "fresh",
+        "source",
+        "hot",
+        "natural",
+        "well"
+      ]
+    }
+  ],
+  "difficulty": "normal",
+  "version": 1
+}

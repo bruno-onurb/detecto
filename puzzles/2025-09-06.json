@@ -1,0 +1,49 @@
+{
+  "date": "2025-09-06",
+  "master": {
+    "answer": "LIGHT",
+    "aliases": [],
+    "funFact": "Light in vacuum travels at ~299,792 km/s.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "BULB",
+      "aliases": [],
+      "hints": [
+        "lamp",
+        "switch",
+        "socket",
+        "LED",
+        "filament"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "SUN",
+      "aliases": [],
+      "hints": [
+        "day",
+        "shine",
+        "sky",
+        "bright",
+        "solar"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "SPEED",
+      "aliases": [],
+      "hints": [
+        "fast",
+        "c",
+        "vacuum",
+        "physics",
+        "einstein"
+      ]
+    }
+  ],
+  "difficulty": "normal",
+  "version": 1
+}

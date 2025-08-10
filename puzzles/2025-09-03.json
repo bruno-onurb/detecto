@@ -1,0 +1,49 @@
+{
+  "date": "2025-09-03",
+  "master": {
+    "answer": "GARDEN",
+    "aliases": [],
+    "funFact": "Community gardens can improve urban biodiversity and food access.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "SOIL",
+      "aliases": [],
+      "hints": [
+        "dirt",
+        "fertile",
+        "loam",
+        "compost",
+        "bed"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "SEED",
+      "aliases": [],
+      "hints": [
+        "plant",
+        "sow",
+        "packet",
+        "sprout",
+        "germinate"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "WEED",
+      "aliases": [],
+      "hints": [
+        "pull",
+        "unwanted",
+        "grow",
+        "remove",
+        "invasive"
+      ]
+    }
+  ],
+  "difficulty": "easy",
+  "version": 1
+}

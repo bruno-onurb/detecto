@@ -1,49 +1,49 @@
 {
   "date": "2025-08-10",
   "master": {
-    "answer": "APPLE",
+    "answer": "TUNNEL",
     "aliases": [],
-    "funFact": "There are over 7,500 varieties of apples grown worldwide.",
+    "funFact": "The Channel Tunnel links the UK and France beneath the English Channel.",
     "learnMoreUrl": ""
   },
   "subClues": [
     {
       "id": "A",
-      "answer": "FRUIT",
+      "answer": "BORING",
       "aliases": [],
       "hints": [
-        "red",
-        "green",
-        "sweet",
-        "pie",
-        "orchard"
+        "machine",
+        "TBM",
+        "cutter",
+        "shield",
+        "dig"
       ]
     },
     {
       "id": "B",
-      "answer": "TREE",
+      "answer": "SUBWAY",
       "aliases": [],
       "hints": [
-        "branch",
-        "leaf",
-        "trunk",
-        "orchard",
-        "blossom"
+        "metro",
+        "train",
+        "underground",
+        "station",
+        "line"
       ]
     },
     {
       "id": "C",
-      "answer": "SEED",
+      "answer": "PORTAL",
       "aliases": [],
       "hints": [
-        "core",
-        "plant",
-        "sprout",
-        "pit",
-        "germ"
+        "entrance",
+        "mouth",
+        "arch",
+        "gate",
+        "opening"
       ]
     }
   ],
-  "difficulty": "easy",
+  "difficulty": "normal",
   "version": 1
 }

@@ -1,0 +1,49 @@
+{
+  "date": "2025-09-09",
+  "master": {
+    "answer": "PIANO",
+    "aliases": [],
+    "funFact": "A modern piano typically has 88 keys.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "KEYS",
+      "aliases": [],
+      "hints": [
+        "black",
+        "white",
+        "ivory",
+        "press",
+        "notes"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "PEDAL",
+      "aliases": [],
+      "hints": [
+        "sustain",
+        "soft",
+        "foot",
+        "floor",
+        "damper"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "GRAND",
+      "aliases": [],
+      "hints": [
+        "lid",
+        "concert",
+        "large",
+        "strings",
+        "soundboard"
+      ]
+    }
+  ],
+  "difficulty": "normal",
+  "version": 1
+}

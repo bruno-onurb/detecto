@@ -1,0 +1,49 @@
+{
+  "date": "2025-09-07",
+  "master": {
+    "answer": "MOUSE",
+    "aliases": [],
+    "funFact": "The first computer mouse prototype was made of wood in 1964.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "CHEESE",
+      "aliases": [],
+      "hints": [
+        "food",
+        "hole",
+        "dairy",
+        "trap",
+        "rodent"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "CURSOR",
+      "aliases": [],
+      "hints": [
+        "pointer",
+        "click",
+        "screen",
+        "drag",
+        "arrow"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "TAIL",
+      "aliases": [],
+      "hints": [
+        "long",
+        "animal",
+        "end",
+        "behind",
+        "appendage"
+      ]
+    }
+  ],
+  "difficulty": "easy",
+  "version": 1
+}
