@@ -57,43 +57,100 @@ function saveState(state) {
 // from a server or rotated daily. For now it's static for simplicity.
 // --- Daily Puzzle Loader ---
 let PUZZLE_DATA = null; // will be set before init()
-const STORAGE_KEY = 'detecto-game-state-v3'; // keep as-is in your file
 
-function ymdInTZ(tz){
-  const fmt = new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'});
-  return fmt.format(new Date());
-}
+// Load the latest available puzzle (today, else look back up to 14 days)
+// Supports both formats:
+//  - simple: { date, master: "WORD", clues: ["A","B","C","D"] }
+//  - complex: { date, master:{answer,...}, subClues:[{id,answer,hints,...}] }
+async function loadLatestPuzzle(maxLookbackDays = 14) {
+  const now = new Date();
 
-async function loadTodaysPuzzle(){
-  const today = ymdInTZ(DAILY_TZ);
-  const url = `puzzles/${today}.json`; // RELATIVE path (works on GitHub Pages)
-  try{
-    const res = await fetch(url, { cache: 'no-store' });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const day = await res.json();
-    // Normalize to match old code expectations
-    PUZZLE_DATA = {
-      id: day.id || today,
-      master: day.master,
-      subClues: day.subClues.map(sc => ({ ...sc, revealedCount: 1, solved: false }))
-    };
-  }catch(err){
-    console.error('Missing puzzle for today, falling back to a safe default.', err);
-    PUZZLE_DATA = {
-      id: "fallback-" + today,
-      master: {
-        answer: "David",
-        aliases: ["Michelangelo's David", "Statue of David"],
-        funFact: "Carved from a single block of marble between 1501–1504, Michelangelo’s David stands 17 feet tall in Florence and is a Renaissance icon.",
-        learnMoreUrl: "https://en.wikipedia.org/wiki/David_(Michelangelo)"
-      },
-      subClues: [
-        { id:"A", answer:"Marble", aliases:["Carrara marble"], hints:["stone","white","carve","statue","material"], revealedCount:1, solved:false },
-        { id:"B", answer:"Florence", aliases:["Firenze"], hints:["italy","renaissance","duomo","uffizi","tuscany"], revealedCount:1, solved:false },
-        { id:"C", answer:"Michelangelo", aliases:["Buonarroti"], hints:["artist","sculptor","painter","sistine","renowned"], revealedCount:1, solved:false }
-      ]
-    };
+  for (let back = 0; back <= maxLookbackDays; back++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - back);
+    const ymd = ymdInTZ(d);
+    const url = `puzzles/${ymd}.json`;
+
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const day = await res.json();
+
+      // Normalize to PUZZLE_DATA shape expected by the game
+      // Master
+      let masterObj;
+      if (typeof day.master === 'string') {
+        masterObj = {
+          answer: day.master,
+          aliases: [],
+          funFact: day.funFact || '',
+          learnMoreUrl: day.learnMoreUrl || ''
+        };
+      } else {
+        masterObj = {
+          answer: day.master?.answer ?? '',
+          aliases: day.master?.aliases ?? [],
+          funFact: day.master?.funFact ?? '',
+          learnMoreUrl: day.master?.learnMoreUrl ?? ''
+        };
+      }
+
+      // Sub‑clues
+      let subClues = [];
+      if (Array.isArray(day.subClues)) {
+        subClues = day.subClues.map((sc, i) => ({
+          id: sc.id || String.fromCharCode(65 + i),
+          answer: sc.answer,
+          aliases: sc.aliases || [],
+          hints: sc.hints || [],
+          revealedCount: 1,
+          solved: false
+        }));
+      } else if (Array.isArray(day.clues)) {
+        // Simple format: treat each clue word as the answer, with a single hint (the word itself)
+        subClues = day.clues.slice(0, 4).map((word, i) => ({
+          id: String.fromCharCode(65 + i),
+          answer: word,
+          aliases: [],
+          hints: [word],          // minimal hints so UI logic works
+          revealedCount: 1,
+          solved: false
+        }));
+      }
+
+      PUZZLE_DATA = { id: ymd, master: masterObj, subClues };
+
+      // Update badge if present
+      const badge = document.getElementById('puzzle-status');
+      if (badge) badge.textContent = `Puzzle date: ${ymd}`;
+
+      console.log('Loaded puzzle:', url);
+      return; // success
+    } catch (e) {
+      // try previous day
+    }
   }
+
+  // Ultimate fallback: static safe puzzle
+  const today = ymdInTZ(now);
+  console.error('No puzzle files found in the last 14 days. Using fallback.');
+  PUZZLE_DATA = {
+    id: 'fallback-' + today,
+    master: {
+      answer: 'David',
+      aliases: ["Michelangelo's David", 'Statue of David'],
+      funFact:
+        'Carved from a single block of marble between 1501–1504, Michelangelo’s David stands 17 feet tall in Florence and is a Renaissance icon.',
+      learnMoreUrl: 'https://en.wikipedia.org/wiki/David_(Michelangelo)'
+    },
+    subClues: [
+      { id: 'A', answer: 'Marble', aliases: ['Carrara marble'], hints: ['stone', 'white', 'carve', 'statue', 'material'], revealedCount: 1, solved: false },
+      { id: 'B', answer: 'Florence', aliases: ['Firenze'], hints: ['italy', 'renaissance', 'duomo', 'uffizi', 'tuscany'], revealedCount: 1, solved: false },
+      { id: 'C', answer: 'Michelangelo', aliases: ['Buonarroti'], hints: ['artist', 'sculptor', 'painter', 'sistine', 'renowned'], revealedCount: 1, solved: false }
+    ]
+  };
+  const badge = document.getElementById('puzzle-status');
+  if (badge) badge.textContent = `Puzzle date: ${today} (fallback)`;
 }
 
 // Replace the old DOMContentLoaded with this:
@@ -110,7 +167,7 @@ function startMidnightWatcher(){
     if (now !== current){
       current = now;
       localStorage.removeItem(STORAGE_KEY);
-      await loadTodaysPuzzle();
+      await loadLatestPuzzle(0); // only today at midnight
       prevLivesCount = null; // keep your existing var
       loadGame();            // reuse your existing function
       render();
@@ -1108,28 +1165,19 @@ function init() {
     learnMoreBtn.onclick = () => {};
   }
 }
-// --- Game Bootstrap (paste near bottom) ---
+// --- Game Bootstrap (single source of truth) ---
 async function bootstrap() {
   try {
-    const puzzle = await loadPuzzleWithFallback(14);
-    // --- Game Bootstrap (ensure this is already in your file)
-async function bootstrap() {
-  try {
-    const puzzle = await loadPuzzleWithFallback(14);
+    await loadLatestPuzzle(14);
 
-    // Show which puzzle actually loaded
-    const badge = document.getElementById('puzzle-status');
-    if (badge) badge.textContent = `Puzzle date: ${puzzle.date}`;
-
-    // Reset saved progress if date changed
+    // reset saved progress when the puzzle date changes
     const state = loadState();
-    if (!state || state.date !== puzzle.date) {
-      saveState({ date: puzzle.date, guesses: [], solved: false });
+    if (!state || state.date !== PUZZLE_DATA.id) {
+      saveState({ date: PUZZLE_DATA.id, guesses: [], solved: false });
     }
 
-    // TODO: call your actual init with `puzzle`
-    // initGame(puzzle);
-
+    init();               // your existing init() uses PUZZLE_DATA
+    startMidnightWatcher();
   } catch (err) {
     console.error(err);
     const badge = document.getElementById('puzzle-status');
@@ -1139,21 +1187,3 @@ async function bootstrap() {
 }
 window.addEventListener('DOMContentLoaded', bootstrap);
 
-
-    // Reset saved progress if the stored date is different from the loaded puzzle
-    const state = loadState();
-    if (!state || state.date !== puzzle.date) {
-      saveState({ date: puzzle.date, guesses: [], solved: false });
-    }
-
-    // TODO: call your existing init/start functions here,
-    // and pass `puzzle` if your code expects it.
-    // Example:
-    // initGame(puzzle);
-
-  } catch (err) {
-    console.error(err);
-    alert('Sorry, no puzzles available right now.');
-  }
-}
-window.addEventListener('DOMContentLoaded', bootstrap);
