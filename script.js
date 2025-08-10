@@ -56,7 +56,6 @@ function saveState(state) {
 // Sample puzzle data. In a production scenario this could be loaded
 // from a server or rotated daily. For now it's static for simplicity.
 // --- Daily Puzzle Loader ---
-const DAILY_TZ = 'Europe/Zagreb'; // canonical flip timezone
 let PUZZLE_DATA = null; // will be set before init()
 const STORAGE_KEY = 'detecto-game-state-v3'; // keep as-is in your file
 
