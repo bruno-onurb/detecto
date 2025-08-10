@@ -1,3 +1,50 @@
+// === Countdown to next puzzle (Europe/Zagreb) ===
+(function(){
+  const TZ = 'Europe/Zagreb';
+  let _timerId = null;
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function timeToNextMidnightParts(){
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: TZ, hour12: false,
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    }).formatToParts(new Date());
+
+    const h = +parts.find(p=>p.type==='hour').value;
+    const m = +parts.find(p=>p.type==='minute').value;
+    const s = +parts.find(p=>p.type==='second').value;
+
+    let remaining = 24*3600 - (h*3600 + m*60 + s);
+    if (remaining < 0) remaining = 0;
+
+    const hh = Math.floor(remaining / 3600);
+    const mm = Math.floor((remaining % 3600) / 60);
+    const ss = remaining % 60;
+    return {hh, mm, ss};
+  }
+
+  function renderTimer(){
+    const el = document.querySelector('#next-puzzle-timer strong');
+    if (!el) return;
+    const {hh, mm, ss} = timeToNextMidnightParts();
+    el.textContent = `${pad(hh)}:${pad(mm)}:${pad(ss)}`;
+  }
+
+  function startCountdown(){
+    stopCountdown();
+    renderTimer();
+    _timerId = setInterval(renderTimer, 1000);
+  }
+  function stopCountdown(){
+    if (_timerId){ clearInterval(_timerId); _timerId = null; }
+  }
+
+  // Expose globally so we can start when modal shows
+  window.__detectoTimer = { startCountdown, stopCountdown };
+})();
+
+
 // --- Daily Puzzle Loader + State Guard (paste at very top) ---
 const DAILY_TZ = 'Europe/Zagreb';
 const STORAGE_KEY = 'detecto-game-state-v3'; // saved state key (keep stable)
