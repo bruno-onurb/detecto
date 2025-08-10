@@ -293,11 +293,12 @@ function main(){
   try {
     ensureDir(OUT_DIR);
     const now = new Date();
-    const today = ymd(now);
-    const tomorrow = ymd(new Date(now.getTime() + 24*60*60*1000));
-    write(today);
-    write(tomorrow);
-    console.log('DONE generating puzzles.');
+    for (let offset = 0; offset <= 34; offset++) {
+      const d = new Date(now.getTime() + offset*24*60*60*1000);
+      const dateStr = ymd(d);
+      write(dateStr);
+    }
+    console.log('DONE generating 35 days of puzzles.');
     process.exit(0);
   } catch (e) {
     console.error('GENERATOR ERROR:', e.stack || e.message);
