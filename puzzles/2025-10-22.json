@@ -1,0 +1,49 @@
+{
+  "date": "2025-10-22",
+  "master": {
+    "answer": "APPLE",
+    "aliases": [],
+    "funFact": "There are over 7,500 cultivated apple varieties worldwide.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "FRUIT",
+      "aliases": [],
+      "hints": [
+        "red",
+        "green",
+        "sweet",
+        "orchard",
+        "pie"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "TREE",
+      "aliases": [],
+      "hints": [
+        "branch",
+        "leaf",
+        "trunk",
+        "orchard",
+        "blossom"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "SEED",
+      "aliases": [],
+      "hints": [
+        "core",
+        "plant",
+        "sprout",
+        "pit",
+        "germ"
+      ]
+    }
+  ],
+  "difficulty": "easy",
+  "version": 1
+}
