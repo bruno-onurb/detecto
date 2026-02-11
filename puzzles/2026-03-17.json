@@ -1,0 +1,49 @@
+{
+  "date": "2026-03-17",
+  "master": {
+    "answer": "BRIDGE",
+    "aliases": [],
+    "funFact": "The Golden Gate Bridge opened in 1937.",
+    "learnMoreUrl": ""
+  },
+  "subClues": [
+    {
+      "id": "A",
+      "answer": "RIVER",
+      "aliases": [],
+      "hints": [
+        "water",
+        "bank",
+        "flow",
+        "cross",
+        "current"
+      ]
+    },
+    {
+      "id": "B",
+      "answer": "GAP",
+      "aliases": [],
+      "hints": [
+        "space",
+        "divide",
+        "span",
+        "break",
+        "separate"
+      ]
+    },
+    {
+      "id": "C",
+      "answer": "CARD",
+      "aliases": [],
+      "hints": [
+        "deck",
+        "game",
+        "trick",
+        "bid",
+        "suit"
+      ]
+    }
+  ],
+  "difficulty": "normal",
+  "version": 1
+}
